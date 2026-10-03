@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 
+import Nav from './components/Nav';
+
 const CATS: Record<string, string> = { Health: 'var(--mint)', Mind: 'var(--teal)', Focus: 'var(--grey)' };
 const EMO: Record<string, string> = { Health: '💧', Mind: '🧘', Focus: '🎯' };
 const hist = [3, 4, 5, 4, 6, 5, 3, 4, 4, 5, 6, 5, 4, 3, 5, 6, 6, 4, 5, 5, 3, 4, 5, 6, 5, 4, 5, 6, 5, 0];
@@ -133,14 +135,7 @@ export default function Home() {
   return (
     <div className="app">
       <main>
-        <nav>
-          <div className="logo">✿</div>
-          <button className="pill on">Dashboard</button>
-          <button className="pill">Calendar</button>
-          <button className="pill">Habits</button>
-          <button className="pill">Stats</button>
-          <button className="pill">Settings</button>
-        </nav>
+        <Nav />
         <div className="head">
           <div>
             <div className="crumb">Home › Dashboard</div>
@@ -186,13 +181,13 @@ export default function Home() {
                 </div>
                 <div className="r" style={{ marginTop: 8 }}>
                   <b>{w}%</b>
-                  <span className="mute" style={{ color: '#d7e6ee' }}>Done this week</span>
+                  <span className="mute" style={{ color: '#ddd0f0' }}>Done this week</span>
                 </div>
               </div>
               <div className="box">
                 <div className="r">
                   <span className="ic">✖</span>
-                  <span className="chip" style={{ background: '#fbd9d7' }}>-1.2%</span>
+                  <span className="chip" style={{ background: '#f5d9f7', color: '#8b3a8e' }}>-1.2%</span>
                 </div>
                 <div className="r" style={{ marginTop: 8 }}>
                   <b>{100 - w}%</b>
@@ -207,50 +202,96 @@ export default function Home() {
               <b style={{ fontSize: 20, fontWeight: 600 }}>{w}%</b>
               <span className="chip">+0.5%</span>
             </div>
-            <svg viewBox="0 0 220 110" width="100%" role="img" aria-label="Weekly completion trend">
+            <svg viewBox="0 0 220 120" width="100%" role="img" aria-label="Weekly completion trend" style={{ marginTop: '8px' }}>
+              <g stroke="var(--grey)" strokeWidth="1" strokeDasharray="3 3">
+                <line x1="10" x2="10" y1="20" y2="90" />
+                <line x1="43" x2="43" y1="20" y2="90" />
+                <line x1="76" x2="76" y1="20" y2="90" />
+                <line x1="110" x2="110" y1="20" y2="90" />
+                <line x1="143" x2="143" y1="20" y2="90" />
+                <line x1="176" x2="176" y1="20" y2="90" />
+                <line x1="210" x2="210" y1="20" y2="90" />
+              </g>
               <g stroke="var(--grey)" strokeWidth="1">
                 <line x1="0" x2="220" y1="20" y2="20" />
                 <line x1="0" x2="220" y1="55" y2="55" />
                 <line x1="0" x2="220" y1="90" y2="90" />
               </g>
-              <polyline fill="none" stroke="var(--teal)" strokeWidth="2.5" strokeLinejoin="round" points="5,70 40,55 75,62 110,40 145,48 180,30 215,38" />
-              <circle cx="110" cy="40" r="6" fill="var(--panel)" stroke="var(--teal)" strokeWidth="2.5" />
-              <rect x="88" y="52" width="44" height="18" rx="9" fill="#0c1418" />
-              <text x="110" y="65" fill="#fff" fontSize="10" textAnchor="middle">Thu 83%</text>
+              <polyline fill="none" stroke="var(--teal)" strokeWidth="2.5" strokeLinejoin="round" points="10,70 43,55 76,62 110,40 143,48 176,30 210,38" />
+              <circle cx="110" cy="40" r="5" fill="var(--panel)" stroke="var(--teal)" strokeWidth="2.5" />
+              <rect x="88" y="4" width="44" height="18" rx="9" fill="var(--ink)" />
+              <text x="110" y="17" fill="var(--bg)" fontSize="10" textAnchor="middle" fontWeight="bold">Thu 83%</text>
+              <g fill="var(--mute)" fontSize="10" textAnchor="middle" fontWeight="600">
+                <text x="10" y="110">M</text>
+                <text x="43" y="110">T</text>
+                <text x="76" y="110">W</text>
+                <text x="110" y="110">T</text>
+                <text x="143" y="110">F</text>
+                <text x="176" y="110">S</text>
+                <text x="210" y="110">S</text>
+              </g>
             </svg>
-            <div className="mute">Mon · Tue · Wed · Thu · Fri · Sat · Sun</div>
           </div>
-          <div className="card">
-            <div className="mute">Total habits</div>
-            <h3>Track your habits</h3>
-            <div className="gauge">
-              <svg viewBox="0 0 200 108" width="100%" role="img" aria-label="Habits by category">
-                <g transform="rotate(-180 100 100)">
-                  <circle cx="100" cy="100" r="80" fill="none" stroke="var(--grey)" strokeWidth="26" strokeDasharray={`${half} ${C}`} />
-                  {gaugeCircles}
-                </g>
-              </svg>
-              <div className="c">
-                <span>{n}</span>
-                <small>Total habits</small>
+          <div className="card span2">
+            <div className="mute">Performance</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
+              <div>
+                <h3>Consistency Tracking</h3>
+              </div>
+              <div className="mute" style={{ display: 'flex', gap: '16px', fontSize: '12px' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ display: 'block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--teal)' }}></span> Today's Consistency
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ display: 'block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--mint)' }}></span> Monthly Consistency
+                </span>
               </div>
             </div>
-            <div className="legend" style={{ marginTop: 12 }}>
-              {counts.map(([k, c]) => (
-                <div key={k}>
-                  <span className="d" style={{ background: CATS[k] }}></span>
-                  {k}<b>{c}</b>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="card">
-            <div className="mute">This week</div>
-            <h3>Consistency</h3>
-            <div className="bars">{bars}</div>
-            <div className="mute" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>■ Done</span>
-              <span>■ Not done</span>
+            
+            <div style={{ position: 'relative', height: '140px', width: '100%' }}>
+              <svg viewBox="0 0 400 120" width="100%" height="100%" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="area-teal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--teal)" stopOpacity="0.2"/>
+                    <stop offset="100%" stopColor="var(--teal)" stopOpacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="area-mint" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--mint)" stopOpacity="0.15"/>
+                    <stop offset="100%" stopColor="var(--mint)" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <g stroke="var(--grey)" strokeWidth="1" strokeDasharray="3 3">
+                  <line x1="10" x2="10" y1="0" y2="100" />
+                  <line x1="73" x2="73" y1="0" y2="100" />
+                  <line x1="136" x2="136" y1="0" y2="100" />
+                  <line x1="200" x2="200" y1="0" y2="100" />
+                  <line x1="263" x2="263" y1="0" y2="100" />
+                  <line x1="326" x2="326" y1="0" y2="100" />
+                  <line x1="390" x2="390" y1="0" y2="100" />
+                </g>
+                <g stroke="var(--grey)" strokeWidth="1">
+                  <line x1="0" x2="400" y1="50" y2="50" />
+                  <line x1="0" x2="400" y1="100" y2="100" />
+                </g>
+                
+                {/* Monthly Consistency Area & Curve */}
+                <path d="M 10 70 C 40 70, 40 40, 73 30 C 100 20, 100 60, 136 60 C 170 60, 170 30, 200 40 C 230 50, 230 90, 263 80 C 290 70, 290 40, 326 50 C 360 60, 360 20, 390 10 L 390 100 L 10 100 Z" fill="url(#area-mint)" />
+                <path d="M 10 70 C 40 70, 40 40, 73 30 C 100 20, 100 60, 136 60 C 170 60, 170 30, 200 40 C 230 50, 230 90, 263 80 C 290 70, 290 40, 326 50 C 360 60, 360 20, 390 10" fill="none" stroke="var(--mint)" strokeWidth="2.5" />
+                
+                {/* Today's Consistency Area & Curve */}
+                <path d="M 10 40 C 40 40, 40 10, 73 20 C 100 30, 100 70, 136 80 C 170 90, 170 30, 200 20 C 230 10, 230 50, 263 60 C 290 70, 290 90, 326 80 C 360 70, 360 30, 390 20 L 390 100 L 10 100 Z" fill="url(#area-teal)" />
+                <path d="M 10 40 C 40 40, 40 10, 73 20 C 100 30, 100 70, 136 80 C 170 90, 170 30, 200 20 C 230 10, 230 50, 263 60 C 290 70, 290 90, 326 80 C 360 70, 360 30, 390 20" fill="none" stroke="var(--teal)" strokeWidth="3" />
+                
+                <circle cx="390" cy="20" r="5" fill="var(--panel)" stroke="var(--teal)" strokeWidth="2.5" />
+                <circle cx="390" cy="10" r="4" fill="var(--panel)" stroke="var(--mint)" strokeWidth="2" />
+                
+                <g fill="var(--mute)" fontSize="11" textAnchor="middle" fontWeight="500">
+                  <text x="10" y="118">W1</text>
+                  <text x="136" y="118">W2</text>
+                  <text x="263" y="118">W3</text>
+                  <text x="390" y="118">W4</text>
+                </g>
+              </svg>
             </div>
           </div>
         </div>
@@ -293,22 +334,37 @@ export default function Home() {
             </button>
           ))}
         </div>
-        <div className="score">
-          <div className="opt w">
-            <span>Done</span>
-            <span>{d}</span>
+        <div className="streak-card">
+          <div className="streak-head">
+            <span className="streak-flame">🔥</span>
+            <div>
+              <b className="streak-count">12</b>
+              <span className="streak-label">day streak</span>
+            </div>
           </div>
-          <div className="opt">
-            <span>Left</span>
-            <span>{n - d}</span>
+          <div className="streak-week">
+            {(() => {
+              const today = new Date();
+              const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0
+              const labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+              return labels.map((label, i) => {
+                const isPast = i < dayOfWeek;
+                const isToday = i === dayOfWeek;
+                const isFuture = i > dayOfWeek;
+                const isActive = isPast || (isToday && d > 0);
+                return (
+                  <div key={i} className={`streak-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''}`}>
+                    <div className="streak-circle">
+                      {isActive ? '🔥' : isFuture ? '' : (isToday ? '🔥' : '❄️')}
+                    </div>
+                    <span>{label}</span>
+                  </div>
+                );
+              });
+            })()}
           </div>
-          <div className="opt">
-            <span>Streak</span>
-            <span>12 days</span>
-          </div>
-          <div className="big">
-            <span className="mute" style={{ color: '#d7e6ee' }}>Today's score</span>
-            <b>{pct}%</b>
+          <div className="streak-msg">
+            {d > 0 ? 'Great job today! Keep it going 💪' : 'Complete a habit to keep your streak! 🏃'}
           </div>
         </div>
       </aside>
