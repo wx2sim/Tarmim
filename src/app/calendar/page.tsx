@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import Nav from '../components/Nav';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -86,7 +85,6 @@ export default function CalendarPage() {
   return (
     <div className="app">
       <main>
-        <Nav />
         <div className="head">
           <div>
             <div className="crumb">Home › Calendar</div>
@@ -98,7 +96,7 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <div className="cal-container">
+        <div className="cal-container compact">
           {/* Month navigation */}
           <div className="cal-header">
             <button className="btn" onClick={prevMonth} aria-label="Previous month">←</button>
@@ -130,21 +128,11 @@ export default function CalendarPage() {
               return (
                 <button
                   key={d}
-                  className={`cal-cell ${todayClass} ${selectedClass} ${futureClass}`}
+                  className={`cal-cell lv-bg-${future ? 0 : level} ${todayClass} ${selectedClass} ${futureClass}`}
                   onClick={() => !future && setSelectedDay(d)}
                   disabled={future}
                 >
                   <span className="cal-num">{d}</span>
-                  {!future && count > 0 && (
-                    <div className="cal-dots-row">
-                      {Array.from({ length: Math.min(count, 6) }, (_, j) => (
-                        <span key={j} className={`cal-dot lv${Math.min(Math.ceil((j + 1) / 1.5), 4)}`}></span>
-                      ))}
-                    </div>
-                  )}
-                  {!future && count > 0 && (
-                    <span className={`cal-badge lv${level}`}>{count}/6</span>
-                  )}
                 </button>
               );
             })}
@@ -161,14 +149,126 @@ export default function CalendarPage() {
             <span className="mute">More</span>
           </div>
         </div>
+
+        {/* Accomplishment Chart */}
+        <div className="card" style={{ marginTop: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
+            <div>
+              <div className="mute">Daily performance</div>
+              <h3 style={{ margin: '4px 0 0' }}>Accomplishment this month</h3>
+            </div>
+            <div className="mute" style={{ display: 'flex', gap: 14, fontSize: 12 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'var(--teal)' }}></span> Habits done
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'var(--grey)' }}></span> Average
+              </span>
+            </div>
+          </div>
+
+          <div style={{ position: 'relative', height: 160, width: '100%' }}>
+            {(() => {
+              const activeDays = Object.keys(simData).length;
+              const totalDone = Object.values(simData).reduce((a, b) => a + b, 0);
+              const avgVal = activeDays > 0 ? totalDone / activeDays : 0;
+              const W = 800;
+              const H = 130;
+              const pad = 10;
+
+              // Build data points
+              const points: [number, number][] = [];
+              for (let d = 1; d <= daysInMonth; d++) {
+                const x = pad + ((d - 1) / (daysInMonth - 1)) * (W - pad * 2);
+                const count = simData[d] ?? 0;
+                const y = H - pad - (count / 6) * (H - pad * 2);
+                points.push([x, y]);
+              }
+
+              // Smooth curve using cubic bezier
+              const buildSmoothPath = (pts: [number, number][]) => {
+                if (pts.length < 2) return '';
+                let path = `M ${pts[0][0]} ${pts[0][1]}`;
+                for (let i = 0; i < pts.length - 1; i++) {
+                  const cp = (pts[i + 1][0] - pts[i][0]) / 2.5;
+                  path += ` C ${pts[i][0] + cp} ${pts[i][1]}, ${pts[i + 1][0] - cp} ${pts[i + 1][1]}, ${pts[i + 1][0]} ${pts[i + 1][1]}`;
+                }
+                return path;
+              };
+
+              const linePath = buildSmoothPath(points);
+              const areaPath = linePath + ` L ${points[points.length - 1][0]} ${H} L ${points[0][0]} ${H} Z`;
+
+              // Average line
+              const avgY = H - pad - (avgVal / 6) * (H - pad * 2);
+
+              // X-axis labels (every 5 days)
+              const xLabels = [1, 5, 10, 15, 20, 25, daysInMonth].filter((v, i, a) => a.indexOf(v) === i);
+
+              return (
+                <svg viewBox={`0 0 ${W} ${H + 20}`} width="100%" height="100%" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--teal)" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="var(--teal)" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Horizontal grid lines */}
+                  <g stroke="var(--grey)" strokeWidth="1" strokeDasharray="4 4">
+                    <line x1={pad} x2={W - pad} y1={H - pad} y2={H - pad} />
+                    <line x1={pad} x2={W - pad} y1={(H - pad * 2) * 0.5 + pad} y2={(H - pad * 2) * 0.5 + pad} />
+                    <line x1={pad} x2={W - pad} y1={pad} y2={pad} />
+                  </g>
+
+                  {/* Average line */}
+                  <line x1={pad} x2={W - pad} y1={avgY} y2={avgY} stroke="var(--grey)" strokeWidth="2" strokeDasharray="6 4" />
+
+                  {/* Area fill */}
+                  <path d={areaPath} fill="url(#chart-fill)" />
+
+                  {/* Line */}
+                  <path d={linePath} fill="none" stroke="var(--teal)" strokeWidth="3" />
+
+                  {/* Selected day dot */}
+                  {selectedDay && simData[selectedDay] !== undefined && (() => {
+                    const sx = pad + ((selectedDay - 1) / (daysInMonth - 1)) * (W - pad * 2);
+                    const sy = H - pad - ((simData[selectedDay] ?? 0) / 6) * (H - pad * 2);
+                    const val = simData[selectedDay] ?? 0;
+                    return (
+                      <>
+                        <line x1={sx} x2={sx} y1={sy} y2={H - pad} stroke="var(--mint)" strokeWidth="1.5" strokeDasharray="3 3" />
+                        <circle cx={sx} cy={sy} r="6" fill="var(--panel)" stroke="var(--mint)" strokeWidth="3" />
+                        <rect x={sx - 22} y={sy - 24} width="44" height="18" rx="9" fill="var(--ink)" />
+                        <text x={sx} y={sy - 12} fill="var(--bg)" fontSize="11" textAnchor="middle" fontWeight="bold">{val}/6</text>
+                      </>
+                    );
+                  })()}
+
+                  {/* X-axis labels */}
+                  <g fill="var(--mute)" fontSize="11" textAnchor="middle" fontWeight="500">
+                    {xLabels.map(d => {
+                      const x = pad + ((d - 1) / (daysInMonth - 1)) * (W - pad * 2);
+                      return <text key={d} x={x} y={H + 16}>{d}</text>;
+                    })}
+                  </g>
+
+                  {/* Y-axis labels */}
+                  <g fill="var(--mute)" fontSize="10" textAnchor="end">
+                    <text x={pad - 2} y={H - pad + 4}>0</text>
+                    <text x={pad - 2} y={(H - pad * 2) * 0.5 + pad + 4}>3</text>
+                    <text x={pad - 2} y={pad + 4}>6</text>
+                  </g>
+                </svg>
+              );
+            })()}
+          </div>
+        </div>
       </main>
 
       {/* Sidebar */}
       <aside className="side">
-        <div className="top">
-          <div className="search">🔍 Search…</div>
-          <div className="av">W</div>
-        </div>
+
 
         {selectedDay ? (
           <>
