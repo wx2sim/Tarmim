@@ -105,6 +105,7 @@ main {
 }
 
 .nav-bar-content {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -117,6 +118,7 @@ main {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .nav-right {
@@ -124,6 +126,7 @@ main {
   align-items: center;
   gap: 10px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .search-box {
@@ -145,6 +148,12 @@ main {
 .search-icon {
   font-size: 14px;
   color: var(--mute);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
 .search-input {
@@ -265,7 +274,7 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -313,6 +322,16 @@ h1 {
   color: #ffffffcc;
   position: relative;
   padding: 24px 16px 12px;
+}
+
+.prof-photo {
+  width: clamp(96px, 12vw, 144px);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: url("/wassim-profile.jfif") center / cover no-repeat;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .prof-quick-badge {
@@ -419,6 +438,16 @@ h1 {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   cursor: default;
   min-width: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.heatmap-day {
+  font-size: clamp(9px, 1vw, 12px);
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .heatmap-cell:hover {
@@ -433,6 +462,9 @@ h1 {
 .heatmap-cell.hl2 { background: var(--gh-2); }
 .heatmap-cell.hl3 { background: var(--gh-3); }
 .heatmap-cell.hl4 { background: var(--gh-4); }
+.heatmap-cell.hl2,
+.heatmap-cell.hl3,
+.heatmap-cell.hl4 { color: #fff; }
 
 .heatmap-legend {
   display: flex;
@@ -1642,8 +1674,9 @@ h3 {
   backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
-  z-index: 100;
+  z-index: 1100;
   padding: 20px;
+  overflow-y: auto;
   animation: fadeIn 0.15s;
 }
 
@@ -1677,8 +1710,23 @@ h3 {
   max-width: 480px;
   max-height: 80vh;
   overflow-y: auto;
+  scrollbar-color: var(--grey) transparent;
+  scrollbar-width: thin;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.2s ease-out;
+}
+
+.modal-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+  background: var(--grey);
+  border-radius: 99px;
 }
 
 .modal-header {
@@ -1839,7 +1887,12 @@ h3 {
   }
 
   .modal-cats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .modal-cat-btn {
+    padding: 12px 8px;
   }
 }
 
@@ -2715,8 +2768,8 @@ body.drawer-is-open .app-container {
   letter-spacing: 0.04em;
 }
 
-/* Media Queries for Mobile Responsiveness */
-@media (max-width: 768px) {
+/* Keep the full navigation on wider screens; use compact controls on tablets and phones. */
+@media (max-width: 1080px) {
 
   .desktop-links,
   .desktop-only {
@@ -2726,6 +2779,9 @@ body.drawer-is-open .app-container {
   .hamburger-btn {
     display: grid !important;
   }
+}
+
+@media (max-width: 768px) {
 
   .layout-wrapper {
     width: 100%;
@@ -2742,14 +2798,6 @@ body.drawer-is-open .app-container {
     border-radius: 0;
   }
 
-  .search-input {
-    width: 80px;
-  }
-
-  .search-input:focus {
-    width: 120px;
-  }
-
   main {
     padding: 16px 12px 24px;
   }
@@ -2764,6 +2812,60 @@ body.drawer-is-open .app-container {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
+  }
+
+  .nav-bar-content {
+    gap: 8px;
+  }
+
+  .nav-right {
+    gap: 8px;
+  }
+
+  .search-box {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .search-icon,
+  .hamburger-btn,
+  .notif-bell-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    flex: 0 0 38px;
+  }
+
+  .search-box .search-input {
+    display: none;
+  }
+
+  .search-box.mobile-search-expanded {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42px;
+    padding: 6px 12px;
+    background: var(--card);
+    border: 1px solid var(--grey);
+    border-radius: 12px;
+  }
+
+  .nav-bar-content.search-open {
+    padding-bottom: 50px;
+  }
+
+  .search-box.mobile-search-expanded .search-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .theme-toggle-btn {
+    display: none;
   }
 
   .side {

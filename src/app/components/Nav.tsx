@@ -163,7 +163,7 @@ export default function Nav() {
 
   return (
     <>
-      <nav className="nav-bar-content">
+      <nav className={`nav-bar-content ${mobileSearchOpen ? 'search-open' : ''}`}>
         <div className="nav-left">
           <Link href="/" className="logo" style={{ textDecoration: 'none' }}>✿</Link>
           <div className="desktop-links">
@@ -182,7 +182,15 @@ export default function Nav() {
 
         <div className="nav-right">
           <div className={`search-box ${mobileSearchOpen ? 'mobile-search-expanded' : ''}`}>
-            <span className="search-icon" onClick={() => setMobileSearchOpen(!mobileSearchOpen)}>🔍</span>
+            <button
+              type="button"
+              className="search-icon"
+              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+              aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
+              aria-expanded={mobileSearchOpen}
+            >
+              🔍
+            </button>
             <input
               type="text"
               className="search-input"

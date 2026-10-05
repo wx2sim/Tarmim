@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 /* ─── Premade habit templates ─── */
 const CATEGORIES = [
@@ -113,6 +114,17 @@ export default function HabitsPage() {
       try { localStorage.setItem('habits-page-v1', JSON.stringify(habits)); } catch {}
     }
   }, [habits, mounted]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [modalOpen]);
 
   const toggleDone = (id: string) => {
     setHabits(habits.map(h => h.id === id ? { ...h, done: !h.done } : h));
@@ -275,11 +287,17 @@ export default function HabitsPage() {
       </main>
 
       {/* ─── Modal ─── */}
-      {modalOpen && (
+      {modalOpen && createPortal(
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+          <div
+            className="modal-box"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-habit-modal-title"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>
+              <h2 id="add-habit-modal-title">
                 {modalStep === 'category' && 'Choose a category'}
                 {modalStep === 'option' && selCat?.emoji + ' ' + selCat?.name}
                 {modalStep === 'configure' && 'Configure habit'}
@@ -312,7 +330,7 @@ export default function HabitsPage() {
                     </button>
                   ))}
                 </div>
-              </div>
+                </div>
             )}
 
             {/* Step 3: Configure */}
@@ -359,7 +377,8 @@ export default function HabitsPage() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

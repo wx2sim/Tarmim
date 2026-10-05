@@ -234,7 +234,7 @@ export default function Home() {
             title="Click to manage & check off your habits!"
           >
             <div className="big">
-              W
+              <div className="prof-photo" role="img" aria-label="Wassim profile photo" />
               <span className="prof-quick-badge">✅ Check Habits ({d}/{n})</span>
             </div>
             <div className={`tag ${d > 0 ? 'flame-active' : hr >= 18 ? 'flame-urgent' : ''}`}>
@@ -253,7 +253,7 @@ export default function Home() {
           </Link>
 
           {/* ── Daily Average + Activity Heatmap ── */}
-          <div className="card span2 stat-heatmap-card">
+          <div className="card stat-heatmap-card">
             <div className="stat-heatmap-header">
               <div className="stat-heatmap-left">
                 <div className="ic">⏳</div>
@@ -278,7 +278,9 @@ export default function Home() {
                     key={i}
                     className={`heatmap-cell hl${lvl}`}
                     title={`${day.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })}: ${v} habit${v !== 1 ? 's' : ''}`}
-                  />
+                  >
+                    <span className="heatmap-day">{day.getDate()}</span>
+                  </div>
                 );
               })}
             </div>
